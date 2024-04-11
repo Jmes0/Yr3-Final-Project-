@@ -2,13 +2,22 @@ package com.example.osmtest2;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Geocoder.GeocodeListener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,16 +35,18 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
     LocationManager locationManager;
-
     private IMapController mapController;
-
-
+    EditText location;
+    TextView latitude;
+    TextView longitude;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -46,34 +57,41 @@ public class MapActivity extends AppCompatActivity {
         Context ctx = getApplicationContext();
         setContentView(R.layout.activity_map);
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        startMap();
 
-        //new GPS tracker from GPSTracker class and retrieving latitude and longitude (doesn't work yet, need to change variables)
+        location = findViewById(R.id.inputLoc);
+        latitude = findViewById(R.id.latt);
+        longitude = findViewById(R.id.longg);
 
-        GPSTracker GPSLoc = new GPSTracker();
-        String latitude = String.valueOf(GPSLoc.getD_lat());
-        String longitude = String.valueOf(GPSLoc.getD_long());
-
-        //displaying latitude and longitude on screen (can enter own values as well) not working yet
-        //could or should be put in separate method, or class
-
-        final TextView helloTextView = (TextView) findViewById(R.id.textView6);
-        helloTextView.setText(latitude);
-        final TextView Text2 = (TextView) findViewById(R.id.textView7);
-        Text2.setText(longitude);
-
-        //final EditText lattitude = (EditText) findViewById(R.id.lattitude);
-        //int latt = Integer.parseInt(lattitude.getText().toString());
-        //final EditText longtitude = (EditText) findViewById(R.id.longtitude);
-        //int llong = Integer.parseInt(longtitude.getText().toString());
-
-        Button coordinates = (Button) findViewById(R.id.button);
-
-        coordinates.setOnClickListener(new View.OnClickListener() {
+        Button button = (Button) findViewById(R.id.LocBtn);
+        button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                updateMap();
+                buttonGetCoordinates(map);
             }
         });
+    }
 
+    public void buttonGetCoordinates(MapView view) {
+        Geocoder geocoder = new Geocoder(this);
+        List<Address> addressList;
+
+        try {
+            addressList = geocoder.getFromLocationName(location.toString(), 1);
+
+            if (addressList != null) {
+                double doubleLat = addressList.get(0).getLatitude();
+                double doublelong = addressList.get(0).getLongitude();
+
+                latitude.setText("Latitude: " + String.valueOf(doubleLat));
+                longitude.setText("Longitude: " + String.valueOf(doublelong));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void startMap() {
         //create new map and map controller using OSM and set the zoom
 
         map = (MapView) findViewById(R.id.map);
@@ -81,38 +99,11 @@ public class MapActivity extends AppCompatActivity {
         mapController = map.getController();
         mapController.setZoom(10);
 
-        //setup location manager, should be used for
-
-        locationManager = (LocationManager) getSystemService((Context.LOCATION_SERVICE));
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(lastLocation != null) {
-            updateLoc(lastLocation);
-        }
-
-        //create a new marker to add to map, not working
-
-        Marker m = new Marker(map);
-
-        try {
-            JSONArray markers = new JSONArray();
-            addMarkers(markers, m);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } finally {
-            map.invalidate();
-            mapController.setCenter(m.getPosition());
-        }
-
         //create new geo point and set the center where the map initially loads into
 
         //GeoPoint startPoint = new GeoPoint(GPSLoc.getD_lat(),GPSLoc.getD_long());
         GeoPoint startPoint = new GeoPoint(10,-50);
         mapController.setCenter(startPoint);
-
-
     }
 
     public void updateMap() {
@@ -172,18 +163,6 @@ public class MapActivity extends AppCompatActivity {
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
     }
-
-    public void addMarkers(JSONArray markers, Marker m) throws JSONException {
-        for (int i = 0; i < markers.length(); i++) {
-            JSONObject marker = markers.getJSONObject(i);
-            m.setPosition(new GeoPoint(marker.getDouble("lat"), marker.getDouble("lon")));
-            m.setTitle(marker.getString("data") + " @ " + marker.getString("date"));
-            m.setIcon(getResources().getDrawable(R.drawable.waypoint));
-            m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_TOP);
-            map.getOverlays().add(m);
-        }
-    }
-
 
     public void onLocationChanged(@NonNull Location location) {
 
