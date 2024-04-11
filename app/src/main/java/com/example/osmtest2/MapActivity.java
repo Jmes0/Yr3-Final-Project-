@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -45,8 +44,8 @@ public class MapActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         Context ctx = getApplicationContext();
+        setContentView(R.layout.activity_map);
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-        setContentView(R.layout.activity_main);
 
         //new GPS tracker from GPSTracker class and retrieving latitude and longitude (doesn't work yet, need to change variables)
 
