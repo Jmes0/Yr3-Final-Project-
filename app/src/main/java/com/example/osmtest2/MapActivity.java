@@ -2,41 +2,36 @@ package com.example.osmtest2;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Geocoder.GeocodeListener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
+import org.w3c.dom.Text;
 
-import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +41,9 @@ public class MapActivity extends AppCompatActivity {
     LocationManager locationManager;
     private IMapController mapController;
     EditText location;
-    TextView latitude;
+    TextView data;
     TextView longitude;
+    private static final String USER_AGENT = "Reading";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -58,29 +54,37 @@ public class MapActivity extends AppCompatActivity {
         Context ctx = getApplicationContext();
         setContentView(R.layout.activity_map);
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         startMap();
+        route();
 
         location = findViewById(R.id.inputLoc);
-        latitude = findViewById(R.id.latt);
-        longitude = findViewById(R.id.longg);
+        data = findViewById(R.id.data);
+        //longitude = findViewById(R.id.longg);
 
         Button button = (Button) findViewById(R.id.LocBtn);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                displayCrimeData();
+                createMarker(51.4551,-0.9787);
+                createMarker(51.5072, -0.1276);
             }
         });
     }
 
-    public void displayCrimeData() {
-        CrimeData data = new CrimeData();
-        CrimeData.readRecord("Reading", "R.raw.thames_valley_street.csv");
+    public void displayCrimeData(TextView data) {
+        CrimeData crimeData = new CrimeData();
+        data.setText(crimeData.readRecord("Reading",
+                "R.raw.thames_valley_street.csv"));
 
     }
 
     public void createMarker(double latitude, double longitude) {
         Marker startMarker = new Marker(map);
-        GeoPoint startPoint = new GeoPoint(51.4551,-0.9787);
+        GeoPoint startPoint = new GeoPoint(latitude,longitude);
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         startMarker.setIcon(getResources().getDrawable(R.drawable.marker_icon));
@@ -88,6 +92,22 @@ public class MapActivity extends AppCompatActivity {
 
         map.getOverlays().add(startMarker);
 
+        map.invalidate();
+    }
+
+    public void route() {
+        RoadManager roadManager = new OSRMRoadManager(this, USER_AGENT);
+        ((OSRMRoadManager) roadManager).setMean(OSRMRoadManager.MEAN_BY_BIKE);
+
+        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+        GeoPoint startPoint = new GeoPoint(51.4551, -0.9787);
+        waypoints.add(startPoint);
+        GeoPoint endPoint = new GeoPoint(51.5072, -0.1276);
+        waypoints.add(endPoint);
+
+        Road road = roadManager.getRoad(waypoints);
+        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+        map.getOverlays().add(roadOverlay);
         map.invalidate();
     }
 
@@ -107,7 +127,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     public void updateMap() {
-        GeoPoint Reading = new GeoPoint(51.4551, 0.9787);
+        GeoPoint Reading = new GeoPoint(51.4551, -0.9787);
         mapController.animateTo(Reading);
         mapController.setZoom(20);
     }

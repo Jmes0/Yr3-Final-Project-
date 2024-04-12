@@ -14,7 +14,7 @@ public class CrimeData extends MapActivity {
         String searchTerm = "Reading";
         readRecord(filepath, searchTerm);
     }
-    public static void readRecord(String searchTerm,String filepath) {
+    public static String readRecord(String searchTerm,String filepath) {
         boolean found = false;
         String ID = ""; String name1 = ""; String age = "";
         try {
@@ -32,14 +32,14 @@ public class CrimeData extends MapActivity {
             }
 
             if (found) {
-                System.out.println("ID " + ID + " name " + name1 + " age " + age);
+                return "ID " + ID + " name " + name1 + " age " + age;
             }
             else {
-                System.out.println("Record not found");
+                return "Record not found";
             }
         }
         catch (Exception e) {
-                System.out.println("error");
+                return "error";
         }
     }
 }
