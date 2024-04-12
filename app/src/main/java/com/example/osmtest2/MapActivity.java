@@ -2,6 +2,7 @@ package com.example.osmtest2;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Geocoder.GeocodeListener;
@@ -66,29 +67,28 @@ public class MapActivity extends AppCompatActivity {
         Button button = (Button) findViewById(R.id.LocBtn);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                buttonGetCoordinates(map);
+                displayCrimeData();
             }
         });
     }
 
-    public void buttonGetCoordinates(MapView view) {
-        Geocoder geocoder = new Geocoder(this);
-        List<Address> addressList;
+    public void displayCrimeData() {
+        CrimeData data = new CrimeData();
+        CrimeData.readRecord("Reading", "R.raw.thames_valley_street.csv");
 
-        try {
-            addressList = geocoder.getFromLocationName(location.toString(), 1);
+    }
 
-            if (addressList != null) {
-                double doubleLat = addressList.get(0).getLatitude();
-                double doublelong = addressList.get(0).getLongitude();
+    public void createMarker(double latitude, double longitude) {
+        Marker startMarker = new Marker(map);
+        GeoPoint startPoint = new GeoPoint(51.4551,-0.9787);
+        startMarker.setPosition(startPoint);
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        startMarker.setIcon(getResources().getDrawable(R.drawable.marker_icon));
+        startMarker.setTitle("Start Point");
 
-                latitude.setText("Latitude: " + String.valueOf(doubleLat));
-                longitude.setText("Longitude: " + String.valueOf(doublelong));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        map.getOverlays().add(startMarker);
 
+        map.invalidate();
     }
 
     public void startMap() {
@@ -97,12 +97,12 @@ public class MapActivity extends AppCompatActivity {
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         mapController = map.getController();
-        mapController.setZoom(10);
+        mapController.setZoom(15);
 
         //create new geo point and set the center where the map initially loads into
 
         //GeoPoint startPoint = new GeoPoint(GPSLoc.getD_lat(),GPSLoc.getD_long());
-        GeoPoint startPoint = new GeoPoint(10,-50);
+        GeoPoint startPoint = new GeoPoint(51.4551,-0.9787);
         mapController.setCenter(startPoint);
     }
 
