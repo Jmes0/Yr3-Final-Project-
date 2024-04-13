@@ -49,6 +49,7 @@ public class MapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Context ctx = getApplicationContext();
         setContentView(R.layout.activity_map);
+
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
@@ -56,15 +57,15 @@ public class MapActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         startMap();
-        DisplayRoute(52.9540, -1.1550);
+        //DisplayRoute(51.4489, -0.9502);
 
         location = findViewById(R.id.inputLoc);
 
         Button button = (Button) findViewById(R.id.LocBtn);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                addMarker(51.4551,-0.9787, "Test");
-                addMarker(51.5072, -0.1276, "Test2");
+                addMarker(51.4551,-0.9787, "Test Marker");
+                addMarker(51.4489, -0.9502, "Test2");
             }
         });
     }
@@ -86,12 +87,23 @@ public class MapActivity extends AppCompatActivity {
     }
 
     public void addMarker(double latitude, double longitude, String markerName) {
+
+        //Create new marker using osmdroid Marker method
+
         Marker startMarker = new Marker(map);
+
+        //set GeoPoint location for marker
+
         GeoPoint startPoint = new GeoPoint(latitude,longitude);
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+        //use marker bitmap icon and set name of marker
+
         startMarker.setIcon(getResources().getDrawable(R.drawable.marker_icon));
         startMarker.setTitle(markerName);
+
+        //add marker to map
 
         map.getOverlays().add(startMarker);
 
@@ -99,6 +111,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     public void startMap() {
+
         //create new map and map controller using OSM and set the zoom
 
         map = (MapView) findViewById(R.id.map);
@@ -108,8 +121,7 @@ public class MapActivity extends AppCompatActivity {
 
         //create new geo point and set the center where the map initially loads into
 
-        //GeoPoint startPoint = new GeoPoint(GPSLoc.getD_lat(),GPSLoc.getD_long());
-        GeoPoint startPoint = new GeoPoint(51.4551,-0.9787);
+        GeoPoint startPoint = new GeoPoint(51.4551,-0.9787); //GPS Tracker
         mapController.setCenter(startPoint);
     }
 

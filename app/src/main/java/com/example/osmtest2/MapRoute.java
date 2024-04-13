@@ -24,17 +24,25 @@ public class MapRoute {
 
     public void addRoute(double cd_long, double cd_lat) {
 
+        //Create Road Manager to generate route and set transportation type
+
         OSRMRoadManager roadManager = new OSRMRoadManager(ctx, USER_AGENT);
         roadManager.setMean(OSRMRoadManager.MEAN_BY_BIKE);
 
+        //Store start and end points for route in array
+
         ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-        GeoPoint startPoint = new GeoPoint(51.4551, -0.9787);
+        GeoPoint startPoint = new GeoPoint(51.4551, -0.9787); //will be GPS location
         waypoints.add(startPoint);
         GeoPoint endPoint = new GeoPoint(cd_long, cd_lat);
         waypoints.add(endPoint);
 
+        // generate route and draw lines
+
         Road road = roadManager.getRoad(waypoints);
         Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+
+        // add route to map
 
         map.getOverlays().add(roadOverlay);
         map.invalidate();
