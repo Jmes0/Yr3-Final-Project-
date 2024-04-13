@@ -2,45 +2,62 @@ package com.example.osmtest2;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class CrimeData extends MapActivity {
-    private static Scanner x;
+
 
     public CrimeData() {
         String filepath = "R.raw.thames_valley_street.csv";
         String searchTerm = "Reading";
-        readRecord(filepath, searchTerm);
     }
-    public static String readRecord(String searchTerm,String filepath) {
-        boolean found = false;
-        String ID = ""; String name1 = ""; String age = "";
+    public static String readRecord(String searchTerm,String filepath, String dataType, int filePos) {
+
+        BufferedReader fileReader;
+        String fileLine = null;
+
         try {
-            x = new Scanner(new File(filepath));
-            x.useDelimiter("[,\n]");
-
-            while(x.hasNext() && !found) {
-                ID = x.next();
-                name1 = x.next();
-                age = x.next();
-
-                if (ID.equals(searchTerm)) {
-                    found = true;
+            fileReader = new BufferedReader(new FileReader(filepath));
+            for(int i = 0; i < fileSize(); i++) {
+                if (i == filePos) {
+                    fileLine = fileReader.readLine();
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            if (found) {
-                return "ID " + ID + " name " + name1 + " age " + age;
-            }
-            else {
-                return "Record not found";
-            }
+        if (dataType == "Longitude") {
+            return fileLine;
         }
-        catch (Exception e) {
-                return "error";
+        else if (dataType == "Latitude") {
+            return fileLine;
         }
+        else if (dataType == "Crime") {
+            return fileLine;
+        }
+        return searchTerm;
+    }
+
+    public static double returnLong(String searchTerm,String filepath, int filePos) {
+        String long_str = readRecord(searchTerm, filepath, "Longitude", filePos);
+        return 0;
+    }
+    public static double returnLat(String searchTerm,String filepath, int filePos) {
+        String lat_str = readRecord(searchTerm, filepath, "Latitude", filePos);
+        return 0;
+    }
+    public static String returnCrime(String searchTerm,String filepath, int filePos) {
+        String crime_val = readRecord(searchTerm, filepath, "CrimeType", filePos);
+        return crime_val;
+    }
+
+    public static int fileSize() {
+
+        return 0;
     }
 }
 

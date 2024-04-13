@@ -20,9 +20,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
-import org.osmdroid.bonuspack.routing.Road;
-import org.osmdroid.bonuspack.routing.RoadManager;
+
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -41,9 +39,7 @@ public class MapActivity extends AppCompatActivity {
     LocationManager locationManager;
     private IMapController mapController;
     EditText location;
-    TextView data;
-    TextView longitude;
-    private static final String USER_AGENT = "Reading";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -60,54 +56,45 @@ public class MapActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         startMap();
-        route();
+        DisplayRoute(52.9540, -1.1550);
 
         location = findViewById(R.id.inputLoc);
-        data = findViewById(R.id.data);
-        //longitude = findViewById(R.id.longg);
 
         Button button = (Button) findViewById(R.id.LocBtn);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                createMarker(51.4551,-0.9787);
-                createMarker(51.5072, -0.1276);
+                addMarker(51.4551,-0.9787, "Test");
+                addMarker(51.5072, -0.1276, "Test2");
             }
         });
     }
 
-    public void displayCrimeData(TextView data) {
+    public void DisplayRoute(double longitude, double latitude) {
+        MapRoute mapRoute = new MapRoute(map, this);
+        mapRoute.addRoute(longitude, latitude);
+    }
+
+    public void displayCrimeData(String inputData) {
         CrimeData crimeData = new CrimeData();
-        data.setText(crimeData.readRecord("Reading",
-                "R.raw.thames_valley_street.csv"));
+        for(int i = 0; i < CrimeData.fileSize(); i++) {
+            double Longitude = CrimeData.returnLong("Reading", inputData, i);
+            double Latitude = CrimeData.returnLat("Reading", inputData, i);
+            String Crime = CrimeData.returnCrime("Reading", inputData, i);
+            addMarker(Longitude, Latitude, Crime);
+        }
 
     }
 
-    public void createMarker(double latitude, double longitude) {
+    public void addMarker(double latitude, double longitude, String markerName) {
         Marker startMarker = new Marker(map);
         GeoPoint startPoint = new GeoPoint(latitude,longitude);
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         startMarker.setIcon(getResources().getDrawable(R.drawable.marker_icon));
-        startMarker.setTitle("Start Point");
+        startMarker.setTitle(markerName);
 
         map.getOverlays().add(startMarker);
 
-        map.invalidate();
-    }
-
-    public void route() {
-        RoadManager roadManager = new OSRMRoadManager(this, USER_AGENT);
-        ((OSRMRoadManager) roadManager).setMean(OSRMRoadManager.MEAN_BY_BIKE);
-
-        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-        GeoPoint startPoint = new GeoPoint(51.4551, -0.9787);
-        waypoints.add(startPoint);
-        GeoPoint endPoint = new GeoPoint(51.5072, -0.1276);
-        waypoints.add(endPoint);
-
-        Road road = roadManager.getRoad(waypoints);
-        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-        map.getOverlays().add(roadOverlay);
         map.invalidate();
     }
 
