@@ -1,10 +1,13 @@
 package com.example.osmtest2;
 
+import android.os.FileUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class CrimeData extends MapActivity {
@@ -14,44 +17,40 @@ public class CrimeData extends MapActivity {
         String filepath = "R.raw.thames_valley_street.csv";
         String searchTerm = "Reading";
     }
-    public static String readRecord(String searchTerm,String filepath, String dataType, int filePos) {
+    public static String readRecord(String csvdata, String crimeType, int filePos) {
 
-        BufferedReader fileReader;
-        String fileLine = null;
+        String result = null;
+        int rows = 11;
 
-        try {
-            fileReader = new BufferedReader(new FileReader(filepath));
-            for(int i = 0; i < fileSize(); i++) {
-                if (i == filePos) {
-                    fileLine = fileReader.readLine();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        for(int i = 0; i < rows; i++) {
+            String[] values = csvdata.split(",");
+            result = Arrays.toString(values);
         }
 
-        if (dataType == "Longitude") {
-            return fileLine;
+        if (crimeType == "Longitude") {
+            return result;
         }
-        else if (dataType == "Latitude") {
-            return fileLine;
+        else if (crimeType == "Latitude") {
+            return result;
         }
-        else if (dataType == "Crime") {
-            return fileLine;
+        else if (crimeType == "Crime") {
+            return result;
         }
-        return searchTerm;
+        return "Hellowww";
     }
 
-    public static double returnLong(String searchTerm,String filepath, int filePos) {
-        String long_str = readRecord(searchTerm, filepath, "Longitude", filePos);
-        return 0;
+    public static double returnLong(String filepath, String crimeType, int filePos) {
+        String long_str = readRecord(filepath, crimeType, filePos);
+        double long_db = Double.parseDouble(long_str);
+        return long_db;
     }
-    public static double returnLat(String searchTerm,String filepath, int filePos) {
-        String lat_str = readRecord(searchTerm, filepath, "Latitude", filePos);
-        return 0;
+    public static double returnLat(String filepath, String crimeType, int filePos) {
+        String lat_str = readRecord(filepath, crimeType, filePos);
+        double lat_db = Double.parseDouble(lat_str);
+        return lat_db;
     }
-    public static String returnCrime(String searchTerm,String filepath, int filePos) {
-        String crime_val = readRecord(searchTerm, filepath, "CrimeType", filePos);
+    public static String returnCrime(String filepath, String crimeType, int filePos) {
+        String crime_val = readRecord(filepath, crimeType, filePos);
         return crime_val;
     }
 

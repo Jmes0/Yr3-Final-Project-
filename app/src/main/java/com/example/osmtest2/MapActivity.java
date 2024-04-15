@@ -29,6 +29,11 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +62,7 @@ public class MapActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         startMap();
+        crimeTest(csvToString());
         //DisplayRoute(51.4489, -0.9502);
 
         location = findViewById(R.id.inputLoc);
@@ -75,13 +81,43 @@ public class MapActivity extends AppCompatActivity {
         mapRoute.addRoute(longitude, latitude);
     }
 
+    public String csvToString() {
+        String str = "";
+        StringBuffer buffer = new StringBuffer();
+        InputStream is = getResources().openRawResource(R.raw.thames_valley_street);
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            if (is != null) {
+                while ((str = reader.readLine()) != null) {
+                    buffer.append(str + "\n");
+                }
+            }
+            is.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        } {
+
+        }
+        return buffer.toString();
+    }
+
+    public void crimeTest(String inputData) {
+        TextView test = (TextView) findViewById(R.id.textView);
+        CrimeData data = new CrimeData();
+        //double Longitude = CrimeData.returnLong(inputData, 2);
+        //double Latitude = CrimeData.returnLat(inputData, 2);
+        String Crime = CrimeData.returnCrime(inputData, "Crime", 2);
+        test.setText("Data : " + Crime);
+    }
+
     public void displayCrimeData(String inputData) {
         CrimeData crimeData = new CrimeData();
         for(int i = 0; i < CrimeData.fileSize(); i++) {
-            double Longitude = CrimeData.returnLong("Reading", inputData, i);
-            double Latitude = CrimeData.returnLat("Reading", inputData, i);
-            String Crime = CrimeData.returnCrime("Reading", inputData, i);
-            addMarker(Longitude, Latitude, Crime);
+            double Longitude = CrimeData.returnLong(inputData, "Longitude", i);
+            double Latitude = CrimeData.returnLat(inputData, "Latitude", i);
+            String Crime = CrimeData.returnCrime(inputData, "Crime", i);
+            //addMarker(Longitude, Latitude, Crime);
         }
 
     }
@@ -182,12 +218,6 @@ public class MapActivity extends AppCompatActivity {
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
     }
-
-    public void onLocationChanged(@NonNull Location location) {
-
-    }
-
-    //updates location and re sets the center
 
     public void updateLoc(Location loc) {
         GeoPoint locGeoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());

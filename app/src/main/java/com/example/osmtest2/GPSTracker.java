@@ -65,7 +65,7 @@ public class GPSTracker extends MapActivity {
         }
     }
 
-    @Override
+    //@Override
     public void onLocationChanged(@NonNull Location location) {
         if(ActivityCompat.shouldShowRequestPermissionRationale(GPSTracker.this,android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             ActivityCompat.requestPermissions(GPSTracker.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
