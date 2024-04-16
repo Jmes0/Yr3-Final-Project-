@@ -63,6 +63,7 @@ public class MapActivity extends AppCompatActivity {
 
         startMap();
         crimeTest(csvToString());
+        //returnFileSize();
         //DisplayRoute(51.4489, -0.9502);
 
         location = findViewById(R.id.inputLoc);
@@ -102,6 +103,16 @@ public class MapActivity extends AppCompatActivity {
         return buffer.toString();
     }
 
+    //Testing method
+    public void returnFileSize() {
+        TextView test = (TextView) findViewById(R.id.textView);
+        CrimeData data = new CrimeData();
+        int fileSize = CrimeData.fileSize(csvToString());
+        test.setText("Hello" + fileSize);
+    }
+
+    //testing method
+
     public void crimeTest(String inputData) {
         TextView test = (TextView) findViewById(R.id.textView);
         CrimeData data = new CrimeData();
@@ -113,7 +124,7 @@ public class MapActivity extends AppCompatActivity {
 
     public void displayCrimeData(String inputData) {
         CrimeData crimeData = new CrimeData();
-        for(int i = 0; i < CrimeData.fileSize(); i++) {
+        for(int i = 0; i < CrimeData.fileSize(inputData); i++) {
             double Longitude = CrimeData.returnLong(inputData, "Longitude", i);
             double Latitude = CrimeData.returnLat(inputData, "Latitude", i);
             String Crime = CrimeData.returnCrime(inputData, "Crime", i);
@@ -186,50 +197,4 @@ public class MapActivity extends AppCompatActivity {
         //Configuration.getInstance().save(this, prefs);
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for (int i = 0; i < grantResults.length; i++) {
-            permissionsToRequest.add(permissions[i]);
-        }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    permissionsToRequest.toArray(new String[0]),
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
-        }
-    }
-
-    private void requestPermissionsIfNecessary(String[] permissions) {
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
-                permissionsToRequest.add(permission);
-            }
-        }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    permissionsToRequest.toArray(new String[0]),
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
-        }
-    }
-
-    public void updateLoc(Location loc) {
-        GeoPoint locGeoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());
-        mapController.setCenter(locGeoPoint);
-        map.invalidate();
-    }
-
-
-    private LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(@NonNull Location location) {
-            updateLoc(location);
-        }
-    };
 }

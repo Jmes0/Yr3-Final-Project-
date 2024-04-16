@@ -20,11 +20,18 @@ public class CrimeData extends MapActivity {
     public static String readRecord(String csvdata, String crimeType, int filePos) {
 
         String result = null;
-        int rows = 11;
+        int size = fileSize(csvdata);
+        String[] separatedData = csvdata.split(",");
+        int columns = 11;
 
-        for(int i = 0; i < rows; i++) {
-            String[] values = csvdata.split(",");
-            result = Arrays.toString(values);
+        for(int i = 0; i < 11; i++) {
+            if (i == filePos) {
+
+                //int line = i * columns;
+                result = separatedData[i * filePos];
+                //line++;
+            }
+
         }
 
         if (crimeType == "Longitude") {
@@ -54,9 +61,12 @@ public class CrimeData extends MapActivity {
         return crime_val;
     }
 
-    public static int fileSize() {
-
-        return 0;
+    public static int fileSize(String csvData) {
+        String data = csvData;
+        //int count = 0;
+        String[] parts = data.split(",");
+        int size = (parts.length) / 11;
+    return Math.round(size) - 1;
     }
 }
 
