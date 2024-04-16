@@ -24,15 +24,18 @@ public class CrimeData extends MapActivity {
         String[] separatedData = csvdata.split(",");
         int columns = 11;
 
-        for(int i = 0; i < 11; i++) {
-            if (i == filePos) {
+        for(int j = 0; j < fileSize(csvdata); j++) {
+            for(int i = 0; i < 11; i++) {
+                if (i == filePos) {
 
-                //int line = i * columns;
-                result = separatedData[i * filePos];
-                //line++;
+                    //int line = i * columns;
+                    result = separatedData[i];
+                    //line++;
+                }
+
             }
-
         }
+
 
         if (crimeType == "Longitude") {
             return result;

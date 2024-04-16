@@ -61,10 +61,15 @@ public class MapActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        //This method initializes the map
+
         startMap();
-        crimeTest(csvToString());
+        //crimeTest(csvToString());
         //returnFileSize();
-        //DisplayRoute(51.4489, -0.9502);
+
+        //This function is used to create the on screen route
+
+        DisplayRoute(51.4489, -0.9502);
 
         location = findViewById(R.id.inputLoc);
 
@@ -83,6 +88,9 @@ public class MapActivity extends AppCompatActivity {
     }
 
     public String csvToString() {
+
+        //Storing csv crime data into string
+
         String str = "";
         StringBuffer buffer = new StringBuffer();
         InputStream is = getResources().openRawResource(R.raw.thames_valley_street);
@@ -105,21 +113,21 @@ public class MapActivity extends AppCompatActivity {
 
     //Testing method
     public void returnFileSize() {
-        TextView test = (TextView) findViewById(R.id.textView);
+        //TextView test = (TextView) findViewById(R.id.textView);
         CrimeData data = new CrimeData();
         int fileSize = CrimeData.fileSize(csvToString());
-        test.setText("Hello" + fileSize);
+        //test.setText("Hello" + fileSize);
     }
 
     //testing method
 
     public void crimeTest(String inputData) {
-        TextView test = (TextView) findViewById(R.id.textView);
+        //TextView test = (TextView) findViewById(R.id.textView);
         CrimeData data = new CrimeData();
         //double Longitude = CrimeData.returnLong(inputData, 2);
         //double Latitude = CrimeData.returnLat(inputData, 2);
         String Crime = CrimeData.returnCrime(inputData, "Crime", 2);
-        test.setText("Data : " + Crime);
+        //test.setText("Data : " + Crime);
     }
 
     public void displayCrimeData(String inputData) {
