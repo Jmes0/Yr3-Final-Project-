@@ -19,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.github.mikephil.charting.BuildConfig;
+
 import org.osmdroid.api.IMapController;
 
 import org.osmdroid.config.Configuration;
@@ -37,6 +39,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class MapActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
@@ -44,6 +47,7 @@ public class MapActivity extends AppCompatActivity {
     LocationManager locationManager;
     private IMapController mapController;
     EditText location;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +59,8 @@ public class MapActivity extends AppCompatActivity {
         Context ctx = getApplicationContext();
         setContentView(R.layout.activity_map);
 
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx)) ;
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -64,21 +68,22 @@ public class MapActivity extends AppCompatActivity {
         //This method initializes the map
 
         startMap();
-        //crimeTest(csvToString());
-        //returnFileSize();
 
         //This function is used to create the on screen route
 
         DisplayRoute(51.4489, -0.9502);
 
-        location = findViewById(R.id.inputLoc);
+        //location = findViewById(R.id.Search);
 
         Button button = (Button) findViewById(R.id.LocBtn);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                addMarker(51.4551,-0.9787, "Test Marker");
-                addMarker(51.4489, -0.9502, "Test2");
+        button.setOnClickListener((view) -> {
+
+            //addMarker(51.4551,-0.9787, "Test Marker");
+            //addMarker(51.4489, -0.9502, "Test2");
+            for(int i = 1; i < 100; i++) {
+                crimeMarker(i);
             }
+
         });
     }
 
@@ -87,57 +92,30 @@ public class MapActivity extends AppCompatActivity {
         mapRoute.addRoute(longitude, latitude);
     }
 
-    public String csvToString() {
-
-        //Storing csv crime data into string
-
-        String str = "";
-        StringBuffer buffer = new StringBuffer();
-        InputStream is = getResources().openRawResource(R.raw.thames_valley_street);
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            if (is != null) {
-                while ((str = reader.readLine()) != null) {
-                    buffer.append(str + "\n");
-                }
-            }
-            is.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        } {
-
-        }
-        return buffer.toString();
-    }
-
     //Testing method
-    public void returnFileSize() {
-        //TextView test = (TextView) findViewById(R.id.textView);
+    public void crimeMarker(int lineNum) {
+        Scanner crimeDataIs = new Scanner(getResources().openRawResource(R.raw.thames_valley_street));
+        String CDdata = "";
+
         CrimeData data = new CrimeData();
-        int fileSize = CrimeData.fileSize(csvToString());
-        //test.setText("Hello" + fileSize);
-    }
 
-    //testing method
-
-    public void crimeTest(String inputData) {
-        //TextView test = (TextView) findViewById(R.id.textView);
-        CrimeData data = new CrimeData();
-        //double Longitude = CrimeData.returnLong(inputData, 2);
-        //double Latitude = CrimeData.returnLat(inputData, 2);
-        String Crime = CrimeData.returnCrime(inputData, "Crime", 2);
-        //test.setText("Data : " + Crime);
-    }
-
-    public void displayCrimeData(String inputData) {
-        CrimeData crimeData = new CrimeData();
-        for(int i = 0; i < CrimeData.fileSize(inputData); i++) {
-            double Longitude = CrimeData.returnLong(inputData, "Longitude", i);
-            double Latitude = CrimeData.returnLat(inputData, "Latitude", i);
-            String Crime = CrimeData.returnCrime(inputData, "Crime", i);
-            //addMarker(Longitude, Latitude, Crime);
+        crimeDataIs.nextLine();
+        int count = 0;
+        while(count != lineNum) {
+            CDdata = crimeDataIs.nextLine();
+            count++;
         }
+        //CDdata = input.nextLine();
+        double llong = CrimeData.returnCoordinates(CDdata, "Longitude");
+        double latt = CrimeData.returnCoordinates(CDdata, "Latitude");
+        String crime = CrimeData.returnCrime(CDdata);
+
+        if(llong < 51.46 || llong > 51.45) {
+            if(latt < -0.96 || latt > -0.98) {
+                addMarker(latt,llong, crime);
+            }
+        }
+
 
     }
 
