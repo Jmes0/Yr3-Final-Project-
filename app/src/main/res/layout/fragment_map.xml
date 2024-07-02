@@ -6,7 +6,16 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/LocBtn"
+        android:id="@+id/MarkerBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:insetRight="6dp"
+        android:text="Add Markers"
+        android:translationY="40dp" />
+
+    <Button
+        android:id="@+id/MenuBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

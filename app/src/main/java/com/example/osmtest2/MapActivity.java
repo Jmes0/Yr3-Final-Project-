@@ -57,7 +57,9 @@ public class MapActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         Context ctx = getApplicationContext();
-        setContentView(R.layout.activity_map);
+        setContentView(R.layout.fragment_map);
+
+        MapFragment mf = new MapFragment();
 
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx)) ;
@@ -75,14 +77,20 @@ public class MapActivity extends AppCompatActivity {
 
         //location = findViewById(R.id.Search);
 
-        Button button = (Button) findViewById(R.id.LocBtn);
+        Button button = (Button) findViewById(R.id.MarkerBtn);
         button.setOnClickListener((view) -> {
-
-            //addMarker(51.4551,-0.9787, "Test Marker");
-            //addMarker(51.4489, -0.9502, "Test2");
-            for(int i = 1; i < 100; i++) {
+            System.out.println("Test");
+            addMarker(51.4551,-0.9787, "Test Marker");
+            addMarker(51.4489, -0.9502, "Test2");
+            for(int i = 1; i < 10; i++) {
                 crimeMarker(i);
             }
+
+        });
+
+        Button button2 = (Button) findViewById(R.id.MenuBtn);
+        button.setOnClickListener((view) -> {
+            System.out.println("Test");
 
         });
     }
@@ -110,11 +118,7 @@ public class MapActivity extends AppCompatActivity {
         double latt = CrimeData.returnCoordinates(CDdata, "Latitude");
         String crime = CrimeData.returnCrime(CDdata);
 
-        if(llong < 51.46 || llong > 51.45) {
-            if(latt < -0.96 || latt > -0.98) {
-                addMarker(latt,llong, crime);
-            }
-        }
+        addMarker(latt,llong, crime);
 
 
     }
